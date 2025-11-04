@@ -1,19 +1,20 @@
 #!/bin/bash
 
-REGION="us-east-2"
-INSTANCE_ID=$(cat instance_id.txt)
+KEY_PATH="my-key-pair.pem" 
+PUBLIC_IP=$(cat instance_ip.txt)
 
-if [ -z "$INSTANCE_ID" ]; then
-    echo "Instance ID not found."
+if [ -z "$PUBLIC_IP" ]; then
+    echo "Public IP not found."
     exit 1
 fi
 
-echo "Stopping instance $INSTANCE_ID..."
-aws ec2 stop-instances --instance-ids "$INSTANCE_ID" --region "$REGION"
-aws ec2 wait instance-stopped --instance-ids "$INSTANCE_ID" --region "$REGION"
-echo "Instance stopped."
+echo "Deploying NGINX to $PUBLIC_IP..."
+ssh -o "StrictHostKeyChecking=no" -i "$KEY_PATH" ubuntu@"$PUBLIC_IP" << 'EOF'
+sudo apt update -y
+sudo apt install -y nginx
+sudo systemctl enable nginx
+sudo systemctl start nginx
+echo "<html><body><h1>Welcome to My NGINX Site!</h1></body></html>" | sudo tee /var/www/html/index.html
+EOF
 
-echo "Terminating instance $INSTANCE_ID..."
-aws ec2 terminate-instances --instance-ids "$INSTANCE_ID" --region "$REGION"
-aws ec2 wait instance-terminated --instance-ids "$INSTANCE_ID" --region "$REGION"
-echo "Instance terminated."
+echo "Site deployed at: http://$PUBLIC_IP"
