@@ -18,3 +18,5 @@ echo "<html><body><h1>Welcome to My NGINX Site!</h1></body></html>" | sudo tee /
 EOF
 
 echo "Site deployed at: http://$PUBLIC_IP"
+
+#ip address is listed as 18.224.108.184
