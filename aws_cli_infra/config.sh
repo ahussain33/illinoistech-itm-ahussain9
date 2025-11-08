@@ -1,7 +1,7 @@
 #!/bin/bash
 
 cat > config.txt << 'EOF'
-REGION=us-east-1
+REGION=us-east-2
 VPC_CIDR=10.0.0.0/16
 SUBNET_CIDR_1=10.0.1.0/24
 SUBNET_CIDR_2=10.0.2.0/24
