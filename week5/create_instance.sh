@@ -42,3 +42,6 @@ echo "No public IP assigned."
 exit 1
 fi
 echo "Instance is running. Public IP: $PUBLIC_IP"
+
+echo $INSTANCE_ID > instance_id.txt
+echo $PUBLIC_IP > instance_ip.txt
