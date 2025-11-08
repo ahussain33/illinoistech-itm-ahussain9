@@ -1,7 +1,5 @@
 #!/bin/bash
 
-
-!/bin/bash
 AMI_ID="ami-0c5ddb3560e768732" 
 INSTANCE_TYPE="t3.micro"
 KEY_NAME="my-key-pair" 
