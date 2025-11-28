@@ -1,4 +1,3 @@
-cat << 'EOF' > create_infrastructure.sh
 #!/bin/bash
 set -e
 
@@ -230,4 +229,3 @@ echo "$PUBLIC_IP" > instance_ip.txt
 
 log_to_cw "EC2 instance created: $INSTANCE_ID ($PUBLIC_IP)"
 send_cw_metric 1
-EOF
