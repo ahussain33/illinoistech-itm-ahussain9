@@ -62,7 +62,6 @@ def parse_resume(file_path: str) -> dict:
             section = "projects"
             continue
 
-        # If we haven't hit a section yet, skip
         if section is None:
             continue
 
