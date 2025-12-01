@@ -4,7 +4,6 @@ set -e
 IP=$(cat instance_ip.txt)
 
 ssh -i my-key-pair-2.pem ubuntu@$IP << 'INNEREOF'
-echo "🛠 Updating app.py with corrected syntax..."
 
 cat > ~/FINAL_PROJECT/api/app.py << 'APPFILE'
 import os
@@ -14,12 +13,10 @@ from resume_parser import parse_resume
 
 app = Flask(__name__)
 
-# Correct frontend folder path
 FRONTEND_DIR = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "frontend")
 )
 
-# Bucket name must be provided via environment variable
 RESUME_BUCKET_NAME = os.environ.get("RESUME_BUCKET_NAME")
 if not RESUME_BUCKET_NAME:
     raise RuntimeError("RESUME_BUCKET_NAME environment variable is not set")
@@ -46,11 +43,9 @@ def upload():
         if filename == "":
             return jsonify({"status": "error", "message": "No selected file"}), 400
 
-        # Save file locally
         filepath = os.path.join("/tmp", filename)
         file.save(filepath)
 
-        # Upload file to S3
         s3_client.upload_file(filepath, RESUME_BUCKET_NAME, filename)
 
         # Parse resume
@@ -70,9 +65,6 @@ def upload():
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=80)
 APPFILE
-
-
-echo "🔧 Restarting Gunicorn..."
 
 sudo pkill -f gunicorn || true
 
