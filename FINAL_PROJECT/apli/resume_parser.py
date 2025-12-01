@@ -46,7 +46,6 @@ def parse_resume(file_path: str) -> dict:
     for line in lines:
         upper_line = line.upper()
 
-        # --- Detect section headers (Harvard template-ish) ---
         if "PERSONAL INFORMATION" in upper_line or "CONTACT" in upper_line:
             section = "personal"
             continue
@@ -67,7 +66,6 @@ def parse_resume(file_path: str) -> dict:
         if section is None:
             continue
 
-        # --- Parse content based on section ---
         if section == "personal":
             key_val = line.split(":", 1)
             if len(key_val) == 2:
