@@ -6,7 +6,6 @@ source cloudwatch_utils.sh
 
 log_to_cw "Destroying infrastructure..."
 
-# Terminate EC2 instances
 if [[ -f instance_id.txt ]]; then
   while read -r INSTANCE_ID; do
     [[ -z "$INSTANCE_ID" ]] && continue
@@ -22,11 +21,9 @@ if [[ -f instance_id.txt ]]; then
     --region "$REGION" || true
 fi
 
-# Delete S3 bucket
 log_to_cw "Deleting S3 bucket: $RESUME_BUCKET_NAME"
 aws s3 rb "s3://$RESUME_BUCKET_NAME" --force || true
 
-# Detach & delete Internet Gateway
 if [[ -f igw_id.txt && -f vpc_id.txt ]]; then
   IGW_ID=$(cat igw_id.txt)
   VPC_ID=$(cat vpc_id.txt)
@@ -42,7 +39,6 @@ if [[ -f igw_id.txt && -f vpc_id.txt ]]; then
     --region "$REGION" 2>/dev/null || true
 fi
 
-# Delete Route Table
 if [[ -f rtb_id.txt ]]; then
   RTB_ID=$(cat rtb_id.txt)
   log_to_cw "Deleting route table: $RTB_ID"
@@ -99,7 +95,6 @@ if [[ -n "$SG_ID" && "$SG_ID" != "None" ]]; then
     --region "$REGION" 2>/dev/null || true
 fi
 
-# Delete VPC
 if [[ -f vpc_id.txt ]]; then
   VPC_ID=$(cat vpc_id.txt)
   log_to_cw "Deleting VPC: $VPC_ID"
@@ -108,12 +103,10 @@ if [[ -f vpc_id.txt ]]; then
     --region "$REGION" 2>/dev/null || true
 fi
 
-# Delete CloudWatch Log Group
 aws logs delete-log-group \
   --log-group-name "$CW_LOG_GROUP" \
   --region "$REGION" 2>/dev/null || true
 
-# Clean up IAM Role / Instance Profile
 if [[ -f instance_profile_name.txt ]]; then
   INSTANCE_PROFILE_NAME=$(cat instance_profile_name.txt)
   IAM_ROLE_NAME="ResumeParserRole"
@@ -140,7 +133,6 @@ if [[ -f instance_profile_name.txt ]]; then
     2>/dev/null || true
 fi
 
-# Local cleanup
 rm -f instance_id.txt instance_ip.txt vpc_id.txt sg_id.txt \
       igw_id.txt rtb_id.txt subnet1_id.txt subnet2_id.txt \
       instance_profile_name.txt teardown.log
