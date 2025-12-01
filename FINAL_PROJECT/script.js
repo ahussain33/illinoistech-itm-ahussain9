@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const file = fileInput.files[0];
     if (!file) {
-      responsePre.textContent = "Please choose a file first.";
+      responsePre.textContent = "Choose a file";
       return;
     }
 
@@ -27,7 +27,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Try reading JSON
     let data;
     try {
       data = await res.json();
@@ -38,25 +37,21 @@ document.addEventListener("DOMContentLoaded", () => {
       return;
     }
 
-    // Handle backend error
     if (!res.ok || data.status === "error") {
       responsePre.textContent =
         "Upload failed: " + (data.message || `status ${res.status}`);
       return;
     }
 
-    // ⭐ BUILD THE OUTPUT MESSAGE ⭐
     let output = "";
     output += `Upload successful!\n`;
     output += `S3 key: ${data.s3_key}\n\n`;
 
-    // Raw parsed text
-    output += "---- Extracted Text ----\n";
+    output += "Full Extracted Text\n";
     output += (data.parsed_text || "(No text extracted)") + "\n\n";
 
-    // Structured parsed data (if available)
     if (data.parsed) {
-      output += "---- Structured Resume Data ----\n";
+      output += "Resume Data in Categories\n";
 
       if (data.parsed.personal && Object.keys(data.parsed.personal).length) {
         output += "\n[Personal]\n";
@@ -94,7 +89,6 @@ document.addEventListener("DOMContentLoaded", () => {
       }
     }
 
-    // Display everything
     responsePre.textContent = output;
   });
 });
