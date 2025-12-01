@@ -5,7 +5,6 @@ from resume_parser import parse_resume
 
 app = Flask(__name__)
 
-# FIXED: proper frontend directory path
 FRONTEND_DIR = os.path.abspath(
     os.path.join(os.path.dirname(__file__), "..", "frontend")
 )
@@ -40,10 +39,8 @@ def upload():
         filepath = os.path.join("/tmp", filename)
         file.save(filepath)
 
-        # Upload file to S3
   s3_client.upload_file(filepath, RESUME_BUCKET_NAME, filename)
 
-        # ⭐ USE YOUR REAL PARSER HERE
         parsed_data = parse_resume(filepath)
 
         return jsonify({
@@ -62,7 +59,7 @@ def upload():
         print("UPLOAD ERROR:", str(e))
         return jsonify({
             "status": "error",
-            "message": str(e)   # <-- THIS is what will finally show on the frontend
+            "message": str(e)   
         }), 500
 
 
