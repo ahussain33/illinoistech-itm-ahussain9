@@ -10,16 +10,11 @@ log() {
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] $*"
 }
 
-# ---------------------------------------------------
-# Sanity: show caller identity
-# ---------------------------------------------------
 log "Checking AWS identity..."
 aws sts get-caller-identity >/dev/null
 log "AWS identity verified."
 
-# ---------------------------------------------------
-# Choose AZ
-# ---------------------------------------------------
+
 AZ=$(aws ec2 describe-availability-zones \
   --region "$REGION" \
   --query 'AvailabilityZones[0].ZoneName' \
@@ -27,9 +22,6 @@ AZ=$(aws ec2 describe-availability-zones \
 
 log "Using region: $REGION, AZ: $AZ"
 
-# ---------------------------------------------------
-# VPC
-# ---------------------------------------------------
 log "Creating VPC..."
 VPC_ID=$(aws ec2 create-vpc \
   --cidr-block "$VPC_CIDR" \
@@ -47,9 +39,6 @@ aws ec2 modify-vpc-attribute \
   --enable-dns-hostnames "{\"Value\":true}" \
   --region "$REGION"
 
-# ---------------------------------------------------
-# Subnets
-# ---------------------------------------------------
 log "Creating Subnet 1..."
 SUBNET1_ID=$(aws ec2 create-subnet \
   --vpc-id "$VPC_ID" \
@@ -76,9 +65,6 @@ SUBNET2_ID=$(aws ec2 create-subnet \
 log "Subnet 2: $SUBNET2_ID"
 echo "$SUBNET2_ID" > subnet2_id.txt
 
-# ---------------------------------------------------
-# Internet Gateway + Route Table
-# ---------------------------------------------------
 log "Creating and attaching Internet Gateway..."
 IGW_ID=$(aws ec2 create-internet-gateway \
   --region "$REGION" \
@@ -123,9 +109,6 @@ aws ec2 associate-route-table \
 
 log "Route table associated with both subnets."
 
-# ---------------------------------------------------
-# Security Group
-# ---------------------------------------------------
 log "Creating security group..."
 
 MY_IP="$(curl -s https://ifconfig.me)/32"
@@ -159,9 +142,6 @@ aws ec2 authorize-security-group-ingress \
 
 log "Ingress rules: 22 from $MY_IP, 80 from 0.0.0.0/0"
 
-# ---------------------------------------------------
-# S3 Bucket (idempotent)
-# ---------------------------------------------------
 log "Ensuring S3 bucket: $RESUME_BUCKET_NAME"
 
 if aws s3api head-bucket --bucket "$RESUME_BUCKET_NAME" 2>/dev/null; then
@@ -174,9 +154,6 @@ else
   log "S3 bucket created."
 fi
 
-# ---------------------------------------------------
-# AMI Lookup
-# ---------------------------------------------------
 log "Looking up Ubuntu AMI..."
 AMI_ID=$(aws ec2 describe-images \
   --owners "$UBUNTU_OWNER" \
@@ -188,9 +165,6 @@ AMI_ID=$(aws ec2 describe-images \
 log "Using AMI: $AMI_ID"
 echo "$AMI_ID" > ami_id.txt
 
-# ---------------------------------------------------
-# EC2 Instance (no user-data; deploy script will configure app)
-# ---------------------------------------------------
 log "Launching EC2 instance..."
 
 INSTANCE_ID=$(aws ec2 run-instances \
