@@ -84,5 +84,8 @@ cd ~/FINAL_PROJECT/api
 sudo -E bash -c "nohup gunicorn --bind 0.0.0.0:80 app:app > /home/ubuntu/gunicorn.log 2>&1 &"
 EOF
 
+chmod +x ./fix_deploy.sh
+./fix_deploy.sh
+
 echo "[SUCCESS] Deployment complete!"
 echo "Open browser: http://$EC2_IP"
