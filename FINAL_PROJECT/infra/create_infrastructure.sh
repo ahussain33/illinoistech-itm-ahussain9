@@ -33,7 +33,6 @@ VPC_ID=$(aws ec2 create-vpc \
 log "VPC created: $VPC_ID"
 echo "$VPC_ID" > vpc_id.txt
 
-# Enable DNS hostnames (nice for SSH)
 aws ec2 modify-vpc-attribute \
   --vpc-id "$VPC_ID" \
   --enable-dns-hostnames "{\"Value\":true}" \
@@ -124,7 +123,6 @@ SG_ID=$(aws ec2 create-security-group \
 log "Security group created: $SG_ID"
 echo "$SG_ID" > sg_id.txt
 
-# Allow SSH from your IP
 aws ec2 authorize-security-group-ingress \
   --group-id "$SG_ID" \
   --protocol tcp \
@@ -132,7 +130,6 @@ aws ec2 authorize-security-group-ingress \
   --cidr "$MY_IP" \
   --region "$REGION" >/dev/null
 
-# Allow HTTP from anywhere
 aws ec2 authorize-security-group-ingress \
   --group-id "$SG_ID" \
   --protocol tcp \
