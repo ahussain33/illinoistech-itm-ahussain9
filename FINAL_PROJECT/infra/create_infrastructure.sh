@@ -14,6 +14,23 @@ log "Checking AWS identity..."
 aws sts get-caller-identity >/dev/null
 log "AWS identity verified."
 
+log "Checking/creating key pair: $KEY_NAME"
+
+if aws ec2 describe-key-pairs \
+  --key-names "$KEY_NAME" \
+  --region "$REGION" 2>/dev/null; then
+  log "Key pair already exists: $KEY_NAME"
+else
+  log "Creating new key pair: $KEY_NAME"
+  aws ec2 create-key-pair \
+    --key-name "$KEY_NAME" \
+    --region "$REGION" \
+    --query 'KeyMaterial' \
+    --output text > "$KEY_NAME.pem"
+  
+  chmod 400 "$KEY_NAME.pem"
+  log "Key pair created and saved to: $KEY_NAME.pem"
+fi
 
 AZ=$(aws ec2 describe-availability-zones \
   --region "$REGION" \
